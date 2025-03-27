@@ -1,0 +1,61 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // ✅ Allow only authenticated users to read/write files
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ✅ Users can only read/write their own profile
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ✅ Car Documents - Only allow the document's owner to access
+    match /car_documents/{userId}/cars/{carId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ✅ Owner Documents - Only allow the document's owner to access
+    match /owner_documents/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ✅ Car Details - Allow **all users to read**, but only owners can write
+    match /car_details/{userId} {
+      allow read: if request.auth != null;  // ✅ Any logged-in user can read all cars
+      allow write: if request.auth != null && request.auth.uid == userId; // 🔒 Only owner can write
+
+      // ✅ Allow all users to read the cars inside the "cars" subcollection
+      match /cars/{carId} {
+        allow read: if request.auth != null;  // ✅ Any user can read
+        allow write: if request.auth != null && request.auth.uid == userId; // 🔒 Only owner can write
+      }
+    }
+
+    // ✅ 🚀 Global Read Access for Cars (Allows collectionGroup("cars"))
+    match /{path=**}/cars/{carId} {
+      allow read : if request.auth != null;  // ✅ Users can read cars anywhere inside Firestore
+    }
+
+				// Allow authenticated users to read rental requests
+    match /rental_requests/{requestId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    // Allow authenticated users to read rental history
+		match /rental_history/{rentalId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    
+  }
+}

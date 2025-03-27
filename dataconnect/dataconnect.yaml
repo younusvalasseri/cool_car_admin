@@ -1,0 +1,12 @@
+specVersion: "v1beta"
+serviceId: "cool_car_admin"
+location: "asia-south1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "cool_car_admin"
+      cloudSql:
+        instanceId: "cool_car_admin"
+      # schemaValidation: "COMPATIBLE"
+connectorDirs: ["./connector"]
