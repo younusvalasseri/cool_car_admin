@@ -41,7 +41,7 @@ class LoginPage extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Hello Cool Owner",
+                              "Hello Cool Admin",
                               style: TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
@@ -50,7 +50,7 @@ class LoginPage extends ConsumerWidget {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              "Welcome to Cool Car Management",
+                              "Welcome to Cool Management",
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.black,

@@ -8,6 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+import '../Main/verify_otp_page.dart';
+import '../views/admin_home_page.dart';
+
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<User?>>(
       (ref) => AuthNotifier(),
@@ -411,3 +414,194 @@ class RegisterState {
     );
   }
 }
+
+final otpNotifierProvider = StateNotifierProvider<OtpNotifier, OtpState>(
+  (ref) => OtpNotifier(),
+);
+
+/// **🔹 OTP Notifier**
+class OtpNotifier extends StateNotifier<OtpState> {
+  OtpNotifier() : super(OtpState());
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  /// **🔹 Set OTP Input**
+  void setOtp(String otp) {
+    state = state.copyWith(otpCode: otp);
+  }
+
+  /// **🔹 Verify OTP & Navigate to Home**
+  Future<void> verifyOtp(BuildContext context, String verificationId) async {
+    if (state.otpCode.isEmpty || state.otpCode.length < 6) return;
+
+    state = state.copyWith(isLoading: true);
+
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: state.otpCode,
+      );
+
+      UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
+      await _saveUserToFirestore(userCredential.user!, state.name, state.email);
+
+      state = state.copyWith(isLoading: false);
+
+      if (!context.mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => AdminHomePage()),
+        (route) => false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("OTP verification failed: $e")));
+    }
+  }
+
+  /// **🔹 Save User to Firestore**
+  Future<void> _saveUserToFirestore(
+    User user,
+    String name,
+    String email,
+  ) async {
+    final userRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid);
+
+    DocumentSnapshot userDoc = await userRef.get();
+    if (!userDoc.exists) {
+      await userRef.set({
+        'name': name,
+        'email': email,
+        'phoneNumber': user.phoneNumber,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+}
+
+/// **🔹 OTP State Model**
+class OtpState {
+  final String otpCode;
+  final bool isLoading;
+  final String phoneNumber;
+  final String verificationId;
+  final String name; // ✅ Include name
+  final String email; // ✅ Include email
+
+  OtpState({
+    this.otpCode = '',
+    this.isLoading = false,
+    this.phoneNumber = '',
+    this.verificationId = '',
+    this.name = '', // ✅ Default to empty string
+    this.email = '', // ✅ Default to empty string
+  });
+
+  OtpState copyWith({
+    String? otpCode,
+    bool? isLoading,
+    String? phoneNumber,
+    String? verificationId,
+    String? name,
+    String? email,
+  }) {
+    return OtpState(
+      otpCode: otpCode ?? this.otpCode,
+      isLoading: isLoading ?? this.isLoading,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      verificationId: verificationId ?? this.verificationId,
+      name: name ?? this.name, // ✅ Preserve values
+      email: email ?? this.email, // ✅ Preserve values
+    );
+  }
+}
+
+final activeRequestsProvider =
+    StreamProvider.autoDispose<List<QueryDocumentSnapshot>>((ref) async* {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        yield [];
+        return;
+      }
+
+      final firestore = FirebaseFirestore.instance;
+
+      try {
+        // Fetch all cars for the owner
+        final carDocs =
+            await firestore
+                .collection('car_details')
+                .doc(user.uid)
+                .collection('cars')
+                .get();
+
+        // ✅ Safely handle missing deleted field (assume false if missing)
+        final nonDeletedCars =
+            carDocs.docs.where((doc) {
+              final data = doc.data();
+              final isDeleted =
+                  (data.containsKey('deleted') && data['deleted'] == true);
+              return !isDeleted;
+            }).toList();
+
+        // Extract valid car categories
+        final Set<String> ownerCategories =
+            nonDeletedCars
+                .map((doc) => doc.data()['expectedClass'] as String?)
+                .where((category) => category != null)
+                .cast<String>()
+                .toSet();
+
+        if (ownerCategories.isEmpty) {
+          yield [];
+          return;
+        }
+
+        // Fetch rental requests that match the car categories
+        final rentalRequestsStream = firestore
+            .collection('rental_requests')
+            .where('category', whereIn: ownerCategories.toList())
+            .snapshots()
+            .map((snapshot) {
+              return snapshot.docs.where((request) {
+                final requestedCategory = request.data()['category'] as String?;
+                return ownerCategories.contains(requestedCategory);
+              }).toList();
+            });
+
+        yield* rentalRequestsStream;
+      } catch (e) {
+        yield [];
+      }
+    });
+final revenueProvider = FutureProvider<Map<String, double>>((ref) async {
+  QuerySnapshot revenueSnapshot =
+      await FirebaseFirestore.instance
+          .collection('rental_history')
+          .where('paymentStatus', isEqualTo: 'Paid')
+          .get();
+
+  Map<String, double> monthlyRevenue = {};
+
+  for (var doc in revenueSnapshot.docs) {
+    final data = doc.data() as Map<String, dynamic>;
+    final date = (data['pickupDate'] as Timestamp).toDate();
+    final monthYear = "${date.year}-${date.month}";
+    final amount = (data['totalFare'] as num).toDouble();
+
+    if (monthlyRevenue.containsKey(monthYear)) {
+      monthlyRevenue[monthYear] = monthlyRevenue[monthYear]! + amount;
+    } else {
+      monthlyRevenue[monthYear] = amount;
+    }
+  }
+
+  return monthlyRevenue;
+});
