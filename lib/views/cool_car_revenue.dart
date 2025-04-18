@@ -1,32 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cool_car_admin/providers/providers.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final revenueProvider = FutureProvider<Map<String, double>>((ref) async {
-  QuerySnapshot revenueSnapshot =
-      await FirebaseFirestore.instance
-          .collection('rental_history')
-          .where('paymentStatus', isEqualTo: 'Paid')
-          .get();
-
-  Map<String, double> monthlyRevenue = {};
-
-  for (var doc in revenueSnapshot.docs) {
-    final data = doc.data() as Map<String, dynamic>;
-    final date = (data['pickupDate'] as Timestamp).toDate();
-    final monthYear = "${date.month}-${date.year}"; // Format Month-Year
-    final amount = (data['totalFare'] as num).toDouble();
-
-    if (monthlyRevenue.containsKey(monthYear)) {
-      monthlyRevenue[monthYear] = monthlyRevenue[monthYear]! + amount;
-    } else {
-      monthlyRevenue[monthYear] = amount;
-    }
-  }
-
-  return monthlyRevenue;
-});
+import '../Widgets/cool_car_app_bar.dart';
 
 class CoolCarRevenuePage extends ConsumerWidget {
   const CoolCarRevenuePage({super.key});
@@ -36,11 +13,7 @@ class CoolCarRevenuePage extends ConsumerWidget {
     final revenueData = ref.watch(revenueProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Revenue Overview"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+      appBar: CoolCarAppBar(customTitle: 'Revenue Overview', showIcons: false),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: revenueData.when(

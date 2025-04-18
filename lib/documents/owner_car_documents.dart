@@ -1,50 +1,37 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../Widgets/cool_car_app_bar.dart';
 import '../views/owner_cars_page.dart';
 
 /// **🔹 Fetch List of Owners**
 final ownersProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final querySnapshot =
-      await FirebaseFirestore.instance
-          .collection('users')
-          .where('role', isEqualTo: 'Owner') // Fetch only owners
-          .get();
+      await FirebaseFirestore.instance.collection('users').get();
 
   return querySnapshot.docs
-      .map(
-        (doc) => {
-          'id': doc.id,
-          'name': doc['name'] ?? 'Unknown Owner',
-          'phone': doc['phone'] ?? 'No Phone',
-        },
-      )
+      .map((doc) => {'id': doc.id, 'name': doc['name'] ?? 'Unknown Owner'})
       .toList();
 });
 
 /// **🔹 Fetch Cars for a Given Owner**
-final ownerCarsProvider =
-    FutureProvider.family<List<Map<String, dynamic>>, String>((
-      ref,
-      ownerId,
-    ) async {
-      final querySnapshot =
-          await FirebaseFirestore.instance
-              .collection('car_details')
-              .doc(ownerId)
-              .collection('cars')
-              .get();
+final ownerCarsProvider = FutureProvider.family<
+  List<Map<String, dynamic>>,
+  String
+>((ref, ownerId) async {
+  final querySnapshot =
+      await FirebaseFirestore.instance
+          .collection('car_details')
+          .doc(ownerId)
+          .collection('cars')
+          .get();
 
-      return querySnapshot.docs
-          .map(
-            (doc) => {
-              'id': doc.id,
-              'model': doc['modelName'] ?? 'Unknown Model',
-              'licensePlate': doc['licensePlate'] ?? 'No Plate',
-            },
-          )
-          .toList();
-    });
+  return querySnapshot.docs
+      .map(
+        (doc) => {'id': doc.id, 'model': doc['modelName'] ?? 'Unknown Model'},
+      )
+      .toList();
+});
 
 /// **🔹 OwnerCarDocumentsPage**
 class OwnerCarDocumentsPage extends ConsumerWidget {
@@ -55,11 +42,7 @@ class OwnerCarDocumentsPage extends ConsumerWidget {
     final owners = ref.watch(ownersProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Owner Car Documents"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+      appBar: CoolCarAppBar(customTitle: 'Trip History', showIcons: false),
       body: owners.when(
         data: (ownersList) {
           if (ownersList.isEmpty) {
@@ -81,10 +64,6 @@ class OwnerCarDocumentsPage extends ConsumerWidget {
                   title: Text(
                     owner['name'],
                     style: const TextStyle(color: Colors.white),
-                  ),
-                  subtitle: Text(
-                    "📞 ${owner['phone']}",
-                    style: const TextStyle(color: Colors.white70),
                   ),
                   trailing: const Icon(
                     Icons.arrow_forward_ios,

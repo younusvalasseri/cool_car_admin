@@ -14,7 +14,6 @@ class DefaultConnector {
     return DefaultConnector(
       dataConnect: FirebaseDataConnect.instanceFor(
         connectorConfig: connectorConfig,
-        sdkType: CallerSDKType.generated,
       ),
     );
   }

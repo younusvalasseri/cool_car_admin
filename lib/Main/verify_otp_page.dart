@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../Widgets/cool_car_app_bar.dart';
 import '../providers/providers.dart';
 
 class VerifyOtpPage extends ConsumerWidget {
@@ -24,13 +25,7 @@ class VerifyOtpPage extends ConsumerWidget {
     final otpNotifier = ref.read(otpNotifierProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Verify OTP"),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black,
-      ),
+      appBar: CoolCarAppBar(customTitle: 'Verify OTP', showIcons: false),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

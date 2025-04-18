@@ -1,15 +1,278 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart' as fb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-
+import 'package:image_cropper/image_cropper.dart';
+import 'package:intl/intl.dart';
 import '../Main/verify_otp_page.dart';
 import '../views/admin_home_page.dart';
+import 'package:image_picker/image_picker.dart';
+
+String formatDate(Timestamp timestamp) {
+  return DateFormat('dd-MMM-yyyy').format(timestamp.toDate());
+}
+
+final updateUserNameProvider =
+    Provider.family<Future<void> Function(String), String>((ref, userId) {
+      return (String newName) async {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user == null) return;
+
+        await user.updateDisplayName(newName);
+        await FirebaseFirestore.instance.collection('users').doc(userId).update(
+          {'name': newName},
+        );
+      };
+    });
+
+final currentUserProvider = Provider<User?>((ref) {
+  return FirebaseAuth.instance.currentUser;
+});
+
+// 🔹 Active rental requests stream
+final activeRequestsStreamProvider = StreamProvider.autoDispose<QuerySnapshot>((
+  ref,
+) {
+  return FirebaseFirestore.instance.collection('rental_requests').snapshots();
+});
+
+// 🔹 Stream for latest chats
+final latestChatsProvider = StreamProvider<QuerySnapshot>((ref) {
+  return FirebaseFirestore.instance
+      .collectionGroup('chats')
+      .orderBy('timestamp', descending: true)
+      .snapshots();
+});
+
+// 🔹 Provider to fetch user data by ID
+final userDataProvider = FutureProvider.family<Map<String, dynamic>?, String>((
+  ref,
+  userId,
+) async {
+  final doc =
+      await FirebaseFirestore.instance.collection('users').doc(userId).get();
+  return doc.exists ? doc.data() : null;
+});
+
+// 🔹 Provider to fetch unread messages count
+final unreadCountProvider = StreamProvider.family<int, String>((ref, userId) {
+  return FirebaseFirestore.instance
+      .collection('messages')
+      .doc(userId)
+      .collection('chats')
+      .where('isRead', isEqualTo: false)
+      .snapshots()
+      .map((snap) => snap.docs.length);
+});
+
+/// 🔹 Stream of chats for a user
+final adminChatStreamProvider = StreamProvider.family
+    .autoDispose<QuerySnapshot, String>((ref, userId) {
+      return FirebaseFirestore.instance
+          .collection('messages')
+          .doc(userId)
+          .collection('chats')
+          .orderBy('timestamp', descending: true)
+          .snapshots();
+    });
+
+/// 🔹 Send message as Admin
+final adminSendMessageProvider = Provider((ref) {
+  return (String userId, String message) {
+    return FirebaseFirestore.instance
+        .collection('messages')
+        .doc(userId)
+        .collection('chats')
+        .add({
+          'sender': 'admin',
+          'text': message,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+  };
+});
+
+/// 🔹 Mark all messages as read
+final adminMarkMessagesReadProvider = Provider((ref) {
+  return (String userId) async {
+    final unreadMessages =
+        await FirebaseFirestore.instance
+            .collection('messages')
+            .doc(userId)
+            .collection('chats')
+            .where('isRead', isEqualTo: false)
+            .get();
+
+    for (var doc in unreadMessages.docs) {
+      await doc.reference.update({'isRead': true});
+    }
+  };
+});
+
+/// 🔹 Get user name
+final fetchChatUserNameProvider = FutureProvider.family<String, String>((
+  ref,
+  userId,
+) async {
+  final doc =
+      await FirebaseFirestore.instance.collection('users').doc(userId).get();
+  return doc.data()?['name'] ?? 'User';
+});
+
+final todaysUsersStreamProvider = StreamProvider.autoDispose((ref) {
+  final now = DateTime.now();
+  final startOfToday = DateTime(now.year, now.month, now.day);
+  return FirebaseFirestore.instance
+      .collection('users')
+      .where(
+        'createdAt',
+        isGreaterThanOrEqualTo: Timestamp.fromDate(startOfToday),
+      )
+      .snapshots();
+});
+
+final unreadMessagesStreamProvider = StreamProvider.autoDispose((ref) {
+  return FirebaseFirestore.instance
+      .collectionGroup('chats')
+      .where('isRead', isEqualTo: false)
+      .snapshots();
+});
+
+/// 📄 Stream provider for fetching all FAQs
+final faqStreamProvider = StreamProvider.autoDispose((ref) {
+  return FirebaseFirestore.instance
+      .collection('FAQ')
+      .orderBy('createdAt', descending: true)
+      .snapshots();
+});
+
+/// 📄 Future provider for adding a new FAQ
+final addFaqProvider = Provider((ref) => AddFaqService());
+
+class AddFaqService {
+  Future<void> addFaq({
+    required String question,
+    required String answer,
+  }) async {
+    if (question.isEmpty || answer.isEmpty) return;
+
+    await FirebaseFirestore.instance.collection('FAQ').add({
+      'question': question,
+      'answer': answer,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+}
+
+final todayNewUsersProvider = StreamProvider<QuerySnapshot>((ref) {
+  final todayStart = Timestamp.fromDate(
+    DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
+  );
+
+  return FirebaseFirestore.instance
+      .collection('users')
+      .where('createdAt', isGreaterThanOrEqualTo: todayStart)
+      .orderBy('createdAt', descending: true)
+      .snapshots();
+});
+
+final tripHistoryProvider = StreamProvider.autoDispose((ref) {
+  return FirebaseFirestore.instance
+      .collection('rental_history')
+      .orderBy('pickupDate', descending: true)
+      .snapshots();
+});
+
+final userDetailsProvider =
+    FutureProvider.family<Map<String, dynamic>?, String>((ref, userId) async {
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .get();
+      return doc.exists ? doc.data() : null;
+    });
+
+final userNameProvider = FutureProvider.family<String, String>((
+  ref,
+  userId,
+) async {
+  final doc =
+      await FirebaseFirestore.instance.collection('users').doc(userId).get();
+  final data = doc.data();
+  return data?['name'] ?? "User: $userId";
+});
+final userDocumentsProvider = FutureProvider<List<Map<String, dynamic>>>((
+  ref,
+) async {
+  final querySnapshot =
+      await FirebaseFirestore.instance.collection('user_documents').get();
+
+  // Add the userId to each document map
+  return querySnapshot.docs.map((doc) {
+    final data = doc.data();
+    data['userId'] = doc.id;
+    return data;
+  }).toList();
+});
+
+class PickAndUploadImage {
+  static Future<void> pickAndUploadImage(
+    WidgetRef ref,
+    BuildContext context,
+  ) async {
+    final picker = ImagePicker();
+    final user = FirebaseAuth.instance.currentUser;
+
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile == null || user == null) return;
+
+    final croppedFile = await ImageCropper().cropImage(
+      sourcePath: pickedFile.path,
+      compressFormat: ImageCompressFormat.jpg,
+      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Crop Image',
+          toolbarColor: Colors.blue,
+          toolbarWidgetColor: Colors.white,
+          lockAspectRatio: true,
+        ),
+        IOSUiSettings(title: 'Crop Image'),
+      ],
+    );
+
+    if (croppedFile == null) return;
+
+    final file = File(croppedFile.path);
+    final storageRef = FirebaseStorage.instance.ref().child(
+      'profile_photos/${user.uid}',
+    );
+
+    await storageRef.putFile(file);
+    final imageUrl = await storageRef.getDownloadURL();
+
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+      'profilePhoto': imageUrl,
+    });
+
+    await user.updatePhotoURL(imageUrl);
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Profile picture updated!")));
+      ref.invalidate(userDetailsProvider);
+    }
+  }
+}
 
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<User?>>(
@@ -605,3 +868,290 @@ final revenueProvider = FutureProvider<Map<String, double>>((ref) async {
 
   return monthlyRevenue;
 });
+final carDocumentsProvider = StateNotifierProvider.family<
+  CarDocsNotifier,
+  AsyncValue<Map<String, String?>>,
+  (String ownerId, String carId)
+>((ref, tuple) => CarDocsNotifier(ownerId: tuple.$1, carId: tuple.$2));
+
+class CarDocsNotifier extends StateNotifier<AsyncValue<Map<String, String?>>> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+
+  final String ownerId;
+  final String carId;
+
+  CarDocsNotifier({required this.ownerId, required this.carId})
+    : super(const AsyncValue.loading()) {
+    fetchCarDocuments();
+  }
+
+  Future<void> fetchCarDocuments() async {
+    try {
+      final docRef = _firestore
+          .collection('car_documents')
+          .doc(ownerId)
+          .collection("cars")
+          .doc(carId);
+
+      final doc = await docRef.get();
+
+      final defaultDocs = {
+        'Vehicle Insurance': null,
+        'Registration Certificate': null,
+        'Certificate of Fitness': null,
+        'Vehicle Permit': null,
+      };
+
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data() as Map<String, dynamic>;
+
+        final updatedDocs = defaultDocs.map(
+          (key, _) => MapEntry(key, data[key.replaceAll(' ', '_')] as String?),
+        );
+
+        state = AsyncValue.data(updatedDocs);
+      } else {
+        state = AsyncValue.data(defaultDocs);
+      }
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+
+  Future<void> uploadCarDocument(String documentType, File file) async {
+    try {
+      String formattedKey = documentType.replaceAll(' ', '_');
+
+      Reference ref = _storage.ref(
+        'car_documents/$ownerId/cars/$carId/$formattedKey.pdf',
+      );
+      UploadTask uploadTask = ref.putFile(file);
+
+      TaskSnapshot snapshot = await uploadTask;
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+
+      await _firestore
+          .collection('car_documents')
+          .doc(ownerId)
+          .collection("cars")
+          .doc(carId)
+          .set({
+            formattedKey: downloadUrl,
+            'uploadedAt': Timestamp.now(),
+          }, SetOptions(merge: true));
+
+      // Update state
+      state = AsyncValue.data({
+        ...state.value ?? {},
+        documentType: downloadUrl,
+      });
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+
+  Future<void> deleteCarDocument(String documentType) async {
+    try {
+      final docRef = _firestore
+          .collection('car_documents')
+          .doc(ownerId)
+          .collection("cars")
+          .doc(carId);
+
+      final docSnap = await docRef.get();
+      if (!docSnap.exists) return;
+
+      String formattedKey = documentType.replaceAll(' ', '_');
+      String? fileUrl = docSnap.data()?[formattedKey];
+
+      if (fileUrl != null) {
+        Reference fileRef = FirebaseStorage.instance.ref().child(
+          "car_documents/$ownerId/cars/$carId/$formattedKey.pdf",
+        );
+
+        await fileRef.delete();
+      }
+
+      await docRef.update({formattedKey: FieldValue.delete()});
+
+      final defaultDocs = {
+        'Vehicle Insurance': null,
+        'Registration Certificate': null,
+        'Certificate of Fitness': null,
+        'Vehicle Permit': null,
+      };
+
+      final updatedDocs = {...state.value ?? {}, formattedKey: null};
+
+      final mergedDocs = {...defaultDocs, ...updatedDocs};
+
+      state = AsyncValue.data(mergedDocs);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+}
+
+final ownerDocumentsProvider = StateNotifierProvider<
+  OwnerDocumentsNotifier,
+  AsyncValue<Map<String, String?>>
+>((ref) => OwnerDocumentsNotifier(ref));
+
+class OwnerDocumentsNotifier
+    extends StateNotifier<AsyncValue<Map<String, String?>>> {
+  final Ref ref;
+
+  OwnerDocumentsNotifier(this.ref) : super(const AsyncValue.loading()) {
+    fetchUploadedFiles();
+  }
+
+  Future<void> fetchUploadedFiles() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      state = const AsyncValue.data({});
+      return;
+    }
+
+    try {
+      DocumentSnapshot doc =
+          await FirebaseFirestore.instance
+              .collection('owner_documents')
+              .doc(user.uid)
+              .get();
+
+      final requiredDocs = {
+        'Bank Details': null,
+        'Police Clearance': null,
+        'Driving License': null,
+        'Aadhar Card Front': null,
+        'Aadhar Card Back': null,
+        'Pan Card': null,
+      };
+
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data() as Map<String, dynamic>;
+
+        // 🔹 Merge Firestore data with required documents list
+        final updatedDocs = requiredDocs.map(
+          (key, value) =>
+              MapEntry(key, data[key.replaceAll(' ', '_')] as String?),
+        );
+
+        state = AsyncValue.data(updatedDocs);
+      } else {
+        state = AsyncValue.data(requiredDocs); // 🔹 Ensure labels are displayed
+      }
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+
+  Future<void> uploadFile(String documentType) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'png', 'pdf'],
+    );
+
+    if (result != null && result.files.single.path != null) {
+      try {
+        final file = File(result.files.single.path!);
+        final refStorage = FirebaseStorage.instance.ref(
+          'owner_documents/${user.uid}/${file.path.split('/').last}',
+        );
+        final snapshot = await refStorage.putFile(file);
+        final fileUrl = await snapshot.ref.getDownloadURL();
+
+        await FirebaseFirestore.instance
+            .collection('owner_documents')
+            .doc(user.uid)
+            .set({
+              documentType.replaceAll(' ', '_'): fileUrl,
+              'uploadedAt': Timestamp.now(),
+            }, SetOptions(merge: true));
+
+        await fetchUploadedFiles();
+
+        bool allUploaded =
+            state.value?.values.every((value) => value != null) ?? false;
+        ref.read(documentsStatusProvider.notifier).updateStatus(allUploaded);
+      } catch (e) {
+        state = AsyncValue.error(e, StackTrace.current);
+      }
+    }
+  }
+
+  Future<void> deleteFile(String documentType) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final fileUrl = state.value?[documentType];
+    if (fileUrl == null || fileUrl.isEmpty) return;
+
+    try {
+      await FirebaseStorage.instance.refFromURL(fileUrl).delete();
+      await FirebaseFirestore.instance
+          .collection('owner_documents')
+          .doc(user.uid)
+          .update({documentType.replaceAll(' ', '_'): FieldValue.delete()});
+
+      await fetchUploadedFiles();
+
+      bool allUploaded =
+          state.value?.values.every((value) => value != null) ?? false;
+      ref.read(documentsStatusProvider.notifier).updateStatus(allUploaded);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+}
+
+final documentsStatusProvider =
+    StateNotifierProvider<DocumentsStatusNotifier, bool>(
+      (ref) => DocumentsStatusNotifier(),
+    );
+
+class DocumentsStatusNotifier extends StateNotifier<bool> {
+  DocumentsStatusNotifier() : super(false) {
+    _checkDocumentsStatus();
+  }
+
+  /// **Check if all documents are uploaded**
+  void _checkDocumentsStatus() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    FirebaseFirestore.instance
+        .collection('owner_documents')
+        .doc(user.uid)
+        .snapshots()
+        .listen((doc) {
+          if (doc.exists) {
+            bool allUploaded = [
+              'Bank_Details',
+              'Police_Clearance',
+              'Driving_License',
+              'Aadhar_Card_Front',
+              'Aadhar_Card_Back',
+              'Pan_Card',
+            ].every(
+              (field) =>
+                  doc.data()?.containsKey(field) == true &&
+                  doc[field] != null &&
+                  doc[field].toString().isNotEmpty,
+            ); // ✅ Check null & empty
+
+            state = allUploaded; // ✅ Update Riverpod state
+          }
+        });
+  }
+
+  /// **Manually update the status**
+  void updateStatus(bool newStatus) {
+    state = newStatus;
+  }
+}

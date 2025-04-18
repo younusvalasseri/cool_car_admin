@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../Widgets/cool_car_app_bar.dart';
+import '../Widgets/user_document_tile.dart';
+
 final ownerDocumentsProvider = FutureProvider<List<Map<String, dynamic>>>((
   ref,
 ) async {
@@ -18,11 +21,7 @@ class OwnerDocumentsPage extends ConsumerWidget {
     final ownerDocuments = ref.watch(ownerDocumentsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Owner Documents"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+      appBar: CoolCarAppBar(customTitle: 'Owner documents', showIcons: false),
       body: Container(
         padding: const EdgeInsets.all(16.0),
         child: ownerDocuments.when(
@@ -56,33 +55,32 @@ class OwnerDocumentsPage extends ConsumerWidget {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDocumentRow("Bank Details", doc['Bank_Details']),
-                        _buildDocumentRow(
-                          "Police Clearance",
-                          doc['Police_Clearance'],
+                        DocumentRow(
+                          title: "Bank Details",
+                          documentUrl: doc['Bank_Details'],
                         ),
-                        _buildDocumentRow(
-                          "Driving License",
-                          doc['Driving_License'],
+                        DocumentRow(
+                          title: "Police Clearance",
+                          documentUrl: doc['Police_Clearance'],
                         ),
-                        _buildDocumentRow(
-                          "Aadhar Front",
-                          doc['Aadhar_Card_Front'],
+                        DocumentRow(
+                          title: "Driving License",
+                          documentUrl: doc['Driving_License'],
                         ),
-                        _buildDocumentRow(
-                          "Aadhar Back",
-                          doc['Aadhar_Card_Back'],
+                        DocumentRow(
+                          title: "Aadhar Back",
+                          documentUrl: doc['Aadhar_Card_Back'],
                         ),
-                        _buildDocumentRow("PAN Card", doc['Pan_Card']),
+                        DocumentRow(
+                          title: "Aadhar Front",
+                          documentUrl: doc['Aadhar_Card_Front'],
+                        ),
+                        DocumentRow(
+                          title: "PAN Card",
+                          documentUrl: doc['Pan_Card'],
+                        ),
                       ],
                     ),
-                    trailing: const Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white70,
-                    ),
-                    onTap: () {
-                      // Open document preview or action page
-                    },
                   ),
                 );
               },
@@ -91,32 +89,6 @@ class OwnerDocumentsPage extends ConsumerWidget {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stackTrace) => Center(child: Text("Error: $error")),
         ),
-      ),
-    );
-  }
-
-  /// **🔹 Build Document Row**
-  Widget _buildDocumentRow(String title, String? documentUrl) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Icon(
-            documentUrl != null ? Icons.check_circle : Icons.error,
-            color: documentUrl != null ? Colors.green : Colors.red,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(title, style: const TextStyle(color: Colors.white)),
-          ),
-          if (documentUrl != null)
-            IconButton(
-              icon: const Icon(Icons.remove_red_eye, color: Colors.white),
-              onPressed: () {
-                // TODO: Implement document preview functionality
-              },
-            ),
-        ],
       ),
     );
   }

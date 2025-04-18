@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../Widgets/cool_car_app_bar.dart';
+
 final usersProvider = StreamProvider((ref) {
   return FirebaseFirestore.instance.collection('users').snapshots();
 });
@@ -31,11 +33,7 @@ class ActiveUsersPage extends ConsumerWidget {
     final usersSnapshot = ref.watch(usersProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Active Users"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+      appBar: CoolCarAppBar(customTitle: 'Active Users', showIcons: false),
       body: usersSnapshot.when(
         data: (snapshot) {
           if (snapshot.docs.isEmpty) {

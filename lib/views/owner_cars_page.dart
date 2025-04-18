@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../Widgets/cool_car_app_bar.dart';
 import '../documents/car_documents_page.dart';
 import '../documents/owner_car_documents.dart';
 
@@ -19,11 +19,7 @@ class OwnerCarsPage extends ConsumerWidget {
     final cars = ref.watch(ownerCarsProvider(ownerId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("$ownerName's Cars"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+      appBar: CoolCarAppBar(customTitle: 'Owner cars', showIcons: false),
       body: cars.when(
         data: (carList) {
           if (carList.isEmpty) {
@@ -46,10 +42,7 @@ class OwnerCarsPage extends ConsumerWidget {
                     car['model'],
                     style: const TextStyle(color: Colors.white),
                   ),
-                  subtitle: Text(
-                    "License: ${car['licensePlate']}",
-                    style: const TextStyle(color: Colors.white70),
-                  ),
+
                   trailing: const Icon(
                     Icons.arrow_forward_ios,
                     color: Colors.white70,
@@ -63,6 +56,7 @@ class OwnerCarsPage extends ConsumerWidget {
                               ownerId: ownerId,
                               carId: car['id'],
                               carModel: car['model'],
+                              onDocumentsUpdated: (bool updated) {},
                             ),
                       ),
                     );

@@ -20,10 +20,12 @@ class _SplashScreenState extends State<SplashScreen> {
     // Wait for 3 seconds to show the splash screen.
     await Future.delayed(const Duration(seconds: 3));
     if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const AuthWrapper()),
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const AuthWrapper()),
+        );
+      });
     }
   }
 
@@ -31,9 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(
-        child: Image.asset('assets/cool_car_logo.jpg', width: 200),
-      ),
+      body: Center(child: Image.asset('assets/cool_car_logo.jpg', width: 200)),
     );
   }
 }

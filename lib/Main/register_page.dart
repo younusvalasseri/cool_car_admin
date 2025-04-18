@@ -2,6 +2,8 @@ import 'package:cool_car_admin/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../Widgets/cool_car_app_bar.dart';
+
 class RegisterPage extends ConsumerWidget {
   const RegisterPage({super.key});
 
@@ -11,13 +13,7 @@ class RegisterPage extends ConsumerWidget {
     final registerNotifier = ref.read(registerNotifierProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Register'),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black,
-      ),
+      appBar: CoolCarAppBar(customTitle: 'Register', showIcons: false),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../Widgets/cool_car_app_bar.dart';
+import '../views/admin_chat_list_page.dart';
+import '../views/contact_support_page.dart';
+import '../views/faq_page.dart';
+
 class SupportPage extends StatelessWidget {
   const SupportPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Support"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+      appBar: CoolCarAppBar(customTitle: 'Support', showIcons: false),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.only(bottom: 50, left: 16, right: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -26,15 +27,10 @@ class SupportPage extends StatelessWidget {
               title: "Contact Support",
               description: "Send an email to our support team for assistance.",
               onTap: () {
-                // Handle email support logic here
-              },
-            ),
-            _buildSupportCard(
-              icon: Icons.report_problem,
-              title: "Report an Issue",
-              description: "Let us know if you are facing any problems.",
-              onTap: () {
-                // Handle issue reporting logic
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => ContactSupportPage()),
+                );
               },
             ),
             _buildSupportCard(
@@ -42,7 +38,10 @@ class SupportPage extends StatelessWidget {
               title: "Live Chat",
               description: "Chat with our support team in real-time.",
               onTap: () {
-                // Navigate to chat support page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AdminChatListPage()),
+                );
               },
             ),
             _buildSupportCard(
@@ -50,7 +49,10 @@ class SupportPage extends StatelessWidget {
               title: "FAQs",
               description: "Find answers to frequently asked questions.",
               onTap: () {
-                // Navigate to FAQs page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const FaqPage()),
+                );
               },
             ),
             const Spacer(),

@@ -1,133 +1,126 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../Widgets/cool_car_app_bar.dart';
+import '../providers/providers.dart';
+import 'password_reset_page.dart';
 
-class AdminProfilePage extends StatefulWidget {
+class AdminProfilePage extends ConsumerWidget {
   const AdminProfilePage({super.key});
 
   @override
-  _AdminProfilePageState createState() => _AdminProfilePageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(currentUserProvider);
 
-class _AdminProfilePageState extends State<AdminProfilePage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  bool _isEditing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadAdminDetails();
-  }
-
-  /// **🔹 Load Admin Details from Firebase**
-  void _loadAdminDetails() {
-    final user = _auth.currentUser;
-    if (user != null) {
-      _nameController.text = user.displayName ?? "Admin";
-      _emailController.text = user.email ?? "admin@example.com";
+    if (user == null) {
+      return const Scaffold(body: Center(child: Text("User not found")));
     }
-  }
+    final userDetails = ref.watch(userDetailsProvider(user.uid));
+    final updateUserName = ref.read(updateUserNameProvider(user.uid));
+    final nameController = TextEditingController();
+    final emailController = TextEditingController(text: user.email ?? '');
 
-  /// **🔹 Update Admin Profile Name**
-  Future<void> _updateProfile() async {
-    if (_nameController.text.isEmpty) return;
-
-    try {
-      await _auth.currentUser?.updateDisplayName(_nameController.text);
-      setState(() {
-        _isEditing = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Profile updated successfully!")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Failed to update profile: $e")));
-    }
-  }
-
-  /// **🔹 Logout Admin**
-  Future<void> _logout() async {
-    await _auth.signOut();
-    if (!mounted) return;
-    Navigator.popUntil(context, (route) => route.isFirst);
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Admin Profile"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(icon: const Icon(Icons.logout), onPressed: _logout),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Center(
-              child: CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.blueGrey,
-                child: Icon(Icons.person, size: 50, color: Colors.white),
-              ),
-            ),
-            const SizedBox(height: 20),
+      appBar: CoolCarAppBar(customTitle: 'Admin Profile', showIcons: true),
+      body: userDetails.when(
+        data: (data) {
+          final photoUrl = data?['profilePhoto'];
+          nameController.text = data?['name'] ?? user.displayName ?? 'Admin';
 
-            // 🔹 Name Field
-            TextField(
-              controller: _nameController,
-              enabled: _isEditing,
-              decoration: InputDecoration(
-                labelText: "Name",
-                border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: Icon(_isEditing ? Icons.check : Icons.edit),
-                  onPressed: () {
-                    if (_isEditing) {
-                      _updateProfile();
-                    } else {
-                      setState(() => _isEditing = true);
-                    }
-                  },
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: GestureDetector(
+                    onTap:
+                        () =>
+                            PickAndUploadImage.pickAndUploadImage(ref, context),
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.blueGrey,
+                      backgroundImage:
+                          photoUrl != null ? NetworkImage(photoUrl) : null,
+                      child:
+                          photoUrl == null
+                              ? const Icon(
+                                Icons.person,
+                                size: 50,
+                                color: Colors.white,
+                              )
+                              : null,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 15),
+                const SizedBox(height: 20),
 
-            // 🔹 Email Field (Read-Only)
-            TextField(
-              controller: _emailController,
-              readOnly: true,
-              decoration: const InputDecoration(
-                labelText: "Email",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 15),
+                // Name
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: "Name",
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.check),
+                      onPressed: () async {
+                        final newName = nameController.text.trim();
+                        if (newName.isEmpty) return;
 
-            // 🔹 Change Password Button
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/passwordReset');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
+                        try {
+                          await updateUserName(newName);
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Profile updated successfully!"),
+                            ),
+                          );
+                        } catch (e) {
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Failed to update profile: $e"),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
                 ),
-                child: const Text("Change Password"),
-              ),
+                const SizedBox(height: 15),
+
+                // Email (read-only)
+                TextField(
+                  controller: emailController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: "Email",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                // Change Password
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => PasswordResetPage()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text("Change Password"),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text("Error loading user data: $e")),
       ),
     );
   }

@@ -1,10 +1,12 @@
 import 'package:cool_car_admin/Main/password_reset_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../Widgets/cool_car_app_bar.dart';
 import '../documents/owner_car_documents.dart';
+import '../views/announcement_page.dart';
 import '../views/user_documents_page.dart';
 import '../views/owner_documents_page.dart';
-import 'PrivacyPolicyPage.dart';
+import 'privacy_policy_page.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -12,11 +14,7 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Settings"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
+      appBar: CoolCarAppBar(customTitle: 'Setting', showIcons: false),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -52,6 +50,12 @@ class SettingsPage extends ConsumerWidget {
               title: "Owner Car Documents",
               icon: Icons.directions_car,
               page: const OwnerCarDocumentsPage(),
+            ),
+            _buildSettingsCard(
+              context,
+              title: "New Announcement",
+              icon: Icons.directions_car,
+              page: const AnnouncementsPage(),
             ),
           ],
         ),

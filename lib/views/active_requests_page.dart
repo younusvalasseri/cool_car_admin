@@ -1,29 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../Widgets/cool_car_app_bar.dart';
+import '../providers/providers.dart';
 
 class ActiveRequestsPage extends ConsumerWidget {
   const ActiveRequestsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Active Requests"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream:
-            FirebaseFirestore.instance
-                .collection('rental_requests') // ✅ Fetch rental requests
-                .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    final requestStream = ref.watch(activeRequestsStreamProvider);
 
-          final requests = snapshot.data!.docs;
+    return Scaffold(
+      appBar: CoolCarAppBar(customTitle: 'Active Requests', showIcons: false),
+      body: requestStream.when(
+        data: (snapshot) {
+          final requests = snapshot.docs;
 
           if (requests.isEmpty) {
             return const Center(child: Text("No active requests"));
@@ -36,20 +28,10 @@ class ActiveRequestsPage extends ConsumerWidget {
               final request = requests[index].data() as Map<String, dynamic>;
               final userId = request['userId'];
 
-              return FutureBuilder<DocumentSnapshot>(
-                future:
-                    FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(userId)
-                        .get(),
-                builder: (context, userSnapshot) {
-                  if (!userSnapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+              final userDetailsAsync = ref.watch(userDetailsProvider(userId));
 
-                  final userData =
-                      userSnapshot.data!.data() as Map<String, dynamic>?;
-
+              return userDetailsAsync.when(
+                data: (userData) {
                   return Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -93,10 +75,22 @@ class ActiveRequestsPage extends ConsumerWidget {
                     ),
                   );
                 },
+                loading:
+                    () => const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                error:
+                    (e, _) => Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Text("Error loading user: $e"),
+                    ),
               );
             },
           );
         },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text("Error: $e")),
       ),
     );
   }
