@@ -33,9 +33,7 @@ class AdminHomePage extends ConsumerWidget {
             return Align(
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 500, // Set max width like a mobile screen
-                ),
+                constraints: const BoxConstraints(maxWidth: 500),
                 child: Column(
                   children: [
                     Expanded(
