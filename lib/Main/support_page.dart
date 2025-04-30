@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../Widgets/app_colors.dart';
 import '../Widgets/cool_car_app_bar.dart';
 import '../views/admin_chat_list_page.dart';
 import '../views/contact_support_page.dart';
@@ -62,8 +63,8 @@ class SupportPage extends StatelessWidget {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.primaryBlue,
+                  foregroundColor: AppColors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 12,
@@ -88,19 +89,19 @@ class SupportPage extends StatelessWidget {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      color: Colors.blue.shade700,
+      color: AppColors.primaryBlue,
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
-        leading: Icon(icon, color: Colors.white),
+        leading: Icon(icon, color: AppColors.white),
         title: Text(
           title,
-          style: const TextStyle(color: Colors.white, fontSize: 18),
+          style: const TextStyle(color: AppColors.white, fontSize: 18),
         ),
         subtitle: Text(
           description,
-          style: const TextStyle(color: Colors.white70, fontSize: 14),
+          style: const TextStyle(color: AppColors.white, fontSize: 14),
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white70),
+        trailing: const Icon(Icons.arrow_forward_ios, color: AppColors.white),
         onTap: onTap,
       ),
     );

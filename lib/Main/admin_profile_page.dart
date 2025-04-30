@@ -1,3 +1,4 @@
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../Widgets/cool_car_app_bar.dart';
@@ -38,7 +39,7 @@ class AdminProfilePage extends ConsumerWidget {
                             PickAndUploadImage.pickAndUploadImage(ref, context),
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundColor: Colors.blueGrey,
+                      backgroundColor: AppColors.primaryBlue,
                       backgroundImage:
                           photoUrl != null ? NetworkImage(photoUrl) : null,
                       child:
@@ -46,7 +47,7 @@ class AdminProfilePage extends ConsumerWidget {
                               ? const Icon(
                                 Icons.person,
                                 size: 50,
-                                color: Colors.white,
+                                color: AppColors.white,
                               )
                               : null,
                     ),
@@ -109,8 +110,8 @@ class AdminProfilePage extends ConsumerWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.primaryBlue,
+                      foregroundColor: AppColors.white,
                     ),
                     child: const Text("Change Password"),
                   ),

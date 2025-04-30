@@ -1,3 +1,4 @@
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../providers/auth_helper.dart';
@@ -12,9 +13,9 @@ class CoolCarAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text(customTitle ?? 'CoolCar Admin'),
       centerTitle: true,
-      backgroundColor: Colors.black, // 🔹 Consistent AppBar Background
+      backgroundColor: AppColors.black, // 🔹 Consistent AppBar Background
       elevation: 0,
-      foregroundColor: Colors.white, // 🔹 Text and Icons in White
+      foregroundColor: AppColors.white, // 🔹 Text and Icons in White
       actions:
           showIcons
               ? [

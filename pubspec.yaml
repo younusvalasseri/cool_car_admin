@@ -29,6 +29,7 @@ dependencies:
   image_cropper: ^9.1.0
   image_picker: ^1.1.2
   intl: ^0.20.2
+  percent_indicator: ^4.2.5
   permission_handler: ^11.4.0
   url_launcher: ^6.3.1
   web_socket_channel: ^3.0.2
@@ -58,4 +59,3 @@ flutter:
     - assets/building.jpg
     - assets/car.png
     - assets/placeholder.png
-    - assets/notification_sound.mp3

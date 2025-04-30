@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -45,12 +46,12 @@ class OwnerDocumentsPage extends ConsumerWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  color: Colors.blue.shade700,
+                  color: AppColors.primaryBlue,
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   child: ListTile(
                     title: Text(
                       doc['ownerName'] ?? "Unknown Owner",
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: AppColors.white),
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

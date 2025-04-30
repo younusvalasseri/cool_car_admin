@@ -9,12 +9,44 @@ import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart' as fb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+// import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:intl/intl.dart';
 import '../Main/verify_otp_page.dart';
 import '../views/admin_home_page.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+Future<void> launchDialer(String phoneNumber) async {
+  final Uri telUri = Uri(scheme: 'tel', path: phoneNumber);
+  if (await canLaunchUrl(telUri)) {
+    await launchUrl(telUri);
+  } else {
+    throw 'Could not launch dialer';
+  }
+}
+
+Future<String> getLocationName(String? coordinates) async {
+  if (coordinates == null || coordinates.isEmpty) return "Unknown Location";
+
+  try {
+    List<String> latLng = coordinates.split(",");
+    double latitude = double.parse(latLng[0]);
+    double longitude = double.parse(latLng[1]);
+
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+      latitude,
+      longitude,
+    );
+    if (placemarks.isNotEmpty) {
+      return "${placemarks.first.locality}, ${placemarks.first.country}"; // City & Country
+    }
+  } catch (e) {
+    return "Unknown Location";
+  }
+  return "Unknown Location";
+}
 
 String formatDate(Timestamp timestamp) {
   return DateFormat('dd-MMM-yyyy').format(timestamp.toDate());
@@ -126,7 +158,7 @@ final fetchChatUserNameProvider = FutureProvider.family<String, String>((
   return doc.data()?['name'] ?? 'User';
 });
 
-final todaysUsersStreamProvider = StreamProvider.autoDispose((ref) {
+final todaysUsersStreamProvider = StreamProvider<AsyncValue<int>>((ref) {
   final now = DateTime.now();
   final startOfToday = DateTime(now.year, now.month, now.day);
   return FirebaseFirestore.instance
@@ -135,14 +167,16 @@ final todaysUsersStreamProvider = StreamProvider.autoDispose((ref) {
         'createdAt',
         isGreaterThanOrEqualTo: Timestamp.fromDate(startOfToday),
       )
-      .snapshots();
+      .snapshots()
+      .map((snapshot) => AsyncValue.data(snapshot.docs.length));
 });
 
-final unreadMessagesStreamProvider = StreamProvider.autoDispose((ref) {
+final unreadMessagesStreamProvider = StreamProvider<AsyncValue<int>>((ref) {
   return FirebaseFirestore.instance
-      .collectionGroup('chats')
+      .collection('chats')
       .where('isRead', isEqualTo: false)
-      .snapshots();
+      .snapshots()
+      .map((snapshot) => AsyncValue.data(snapshot.docs.length));
 });
 
 /// 📄 Stream provider for fetching all FAQs
@@ -441,11 +475,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
 
     try {
       final fb.LoginResult result = await fb.FacebookAuth.instance.login(
-        permissions: [
-          "public_profile",
-          "email",
-          "user_mobile_phone",
-        ], // ✅ Request phone number
+        permissions: ["public_profile", "email", "user_mobile_phone"],
       );
 
       if (result.status == fb.LoginStatus.success) {
@@ -504,24 +534,24 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
   }
 }
 
-final connectivityProvider = StateNotifierProvider<ConnectivityNotifier, bool>(
-  (ref) => ConnectivityNotifier(),
-);
+// final connectivityProvider = StateNotifierProvider<ConnectivityNotifier, bool>(
+//   (ref) => ConnectivityNotifier(),
+// );
 
-class ConnectivityNotifier extends StateNotifier<bool> {
-  ConnectivityNotifier() : super(false) {
-    _checkInternetConnection();
-  }
+// class ConnectivityNotifier extends StateNotifier<bool> {
+//   ConnectivityNotifier() : super(false) {
+//     _checkInternetConnection();
+//   }
 
-  void _checkInternetConnection() async {
-    final connectivityResults = await Connectivity().checkConnectivity();
-    state = connectivityResults.contains(ConnectivityResult.none);
+//   void _checkInternetConnection() async {
+//     final connectivityResults = await Connectivity().checkConnectivity();
+//     state = connectivityResults.contains(ConnectivityResult.none);
 
-    Connectivity().onConnectivityChanged.listen((results) {
-      state = results.contains(ConnectivityResult.none);
-    });
-  }
-}
+//     Connectivity().onConnectivityChanged.listen((results) {
+//       state = results.contains(ConnectivityResult.none);
+//     });
+//   }
+// }
 
 final emailControllerProvider = Provider<TextEditingController>((ref) {
   return TextEditingController();

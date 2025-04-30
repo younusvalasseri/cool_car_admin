@@ -1,3 +1,4 @@
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class AdminCard extends StatelessWidget {
@@ -22,7 +23,7 @@ class AdminCard extends StatelessWidget {
         width: isFullWidth ? double.infinity : null,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 0, 139, 252),
+          color: AppColors.primaryBlue,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -31,7 +32,7 @@ class AdminCard extends StatelessWidget {
             Text(
               title,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),

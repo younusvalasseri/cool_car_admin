@@ -1,3 +1,4 @@
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../views/admin_home_page.dart';
@@ -72,9 +73,9 @@ class _RegisterEmailPageState extends State<RegisterEmailPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Register Email'),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
-        foregroundColor: Colors.black,
+        foregroundColor: AppColors.black,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -126,7 +127,7 @@ class _RegisterEmailPageState extends State<RegisterEmailPage> {
                   onPressed: _registerEmail,
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
-                    backgroundColor: Colors.black,
+                    backgroundColor: AppColors.black,
                   ),
                   child: const Text('Register & Continue'),
                 ),

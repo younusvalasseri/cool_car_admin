@@ -1,31 +1,21 @@
-//lib/Main/splash_screen.dart
+// lib/Main/splash_screen.dart
+import 'package:cool_car_admin/Widgets/app_colors.dart';
+
 import '../Main/auth_wrapper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerWidget {
   const SplashScreen({super.key});
 
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    _navigateToAuthWrapper();
-  }
-
-  Future<void> _navigateToAuthWrapper() async {
+  void _navigateToAuthWrapper(BuildContext context) async {
     await Future.delayed(const Duration(seconds: 3));
-    if (mounted) {
+    if (context.mounted) {
       try {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const AuthWrapper()),
-          );
-        });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const AuthWrapper()),
+        );
       } catch (e, stack) {
         debugPrint('Navigation error: $e');
         debugPrintStack(stackTrace: stack);
@@ -34,9 +24,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _navigateToAuthWrapper(context);
+    });
+
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.black,
       body: Center(child: Image.asset('assets/cool_car_logo.jpg', width: 200)),
     );
   }

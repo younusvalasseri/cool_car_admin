@@ -1,3 +1,4 @@
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -28,8 +29,8 @@ class PrivacyPolicyPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Privacy Policy"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.primaryBlue,
+        foregroundColor: AppColors.white,
       ),
       body: WebViewWidget(controller: controller),
     );

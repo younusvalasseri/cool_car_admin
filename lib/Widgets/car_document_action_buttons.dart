@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -32,13 +33,13 @@ class CarDocumentActionButtons extends StatelessWidget {
         children: [
           if (fileUrl != null)
             IconButton(
-              icon: const Icon(Icons.visibility, color: Colors.blue),
+              icon: const Icon(Icons.visibility, color: AppColors.blueIcon),
               onPressed: () => _previewFile(fileUrl),
             ),
           IconButton(
             icon: Icon(
               fileUrl != null ? Icons.edit : Icons.upload_file,
-              color: Colors.blue,
+              color: AppColors.blueIcon,
             ),
             onPressed: () async {
               File? selectedFile = await _pickFile();
@@ -52,7 +53,7 @@ class CarDocumentActionButtons extends StatelessWidget {
           ),
           if (fileUrl != null)
             IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
+              icon: const Icon(Icons.delete, color: AppColors.redIcon),
               onPressed: () async {
                 await ref!
                     .read(carDocumentsProvider((ownerId!, carId!)).notifier)

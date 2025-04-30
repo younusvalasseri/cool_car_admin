@@ -28,100 +28,110 @@ class AdminHomePage extends ConsumerWidget {
             direction: GradientDirection.topToBottom,
           ),
         ),
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 500, // Set max width like a mobile screen
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 10),
-
-                    // 🔹 Full-width cards
-                    AdminCard(
-                      title: "Rental History",
-                      isFullWidth: true,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => TripHistoryPage()),
-                        );
-                      },
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 10),
+                            AdminCard(
+                              title: "Rental History",
+                              isFullWidth: true,
+                              onTap:
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => TripHistoryPage(),
+                                    ),
+                                  ),
+                            ),
+                            const SizedBox(height: 10),
+                            AdminCard(
+                              title: "Active Requests",
+                              isFullWidth: true,
+                              onTap:
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ActiveRequestsPage(),
+                                    ),
+                                  ),
+                            ),
+                            const SizedBox(height: 10),
+                            AdminCard(
+                              title: "Revenue",
+                              isFullWidth: true,
+                              onTap:
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => CoolCarRevenuePage(),
+                                    ),
+                                  ),
+                            ),
+                            const SizedBox(height: 10),
+                            AdminCard(
+                              title: "Active Users",
+                              isFullWidth: true,
+                              onTap:
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ActiveUsersPage(),
+                                    ),
+                                  ),
+                            ),
+                            const SizedBox(height: 10),
+                            TodayCountCard(
+                              label: "🧑🏻 Today's Users",
+                              isFullWidth: true,
+                              stream: ref.watch(
+                                todaysUsersStreamProvider.stream,
+                              ),
+                              onTap:
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const NewUsersPage(),
+                                    ),
+                                  ),
+                            ),
+                            const SizedBox(height: 10),
+                            TodayCountCard(
+                              label: "💬 New Messages",
+                              isFullWidth: true,
+                              stream: ref.watch(
+                                unreadMessagesStreamProvider.stream,
+                              ),
+                              onTap:
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const AdminChatListPage(),
+                                    ),
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 10),
-                    AdminCard(
-                      title: "Active Requests",
-                      isFullWidth: true,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ActiveRequestsPage(),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    AdminCard(
-                      title: "Revenue",
-                      isFullWidth: true,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CoolCarRevenuePage(),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    AdminCard(
-                      title: "Active Users",
-                      isFullWidth: true,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => ActiveUsersPage()),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 10),
-
-                    TodayCountCard(
-                      label: "🧑🏻 Today's Users",
-                      stream: ref.watch(todaysUsersStreamProvider.stream),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const NewUsersPage(),
-                          ),
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 10),
-                    TodayCountCard(
-                      label: "💬 New Messages",
-                      stream: ref.watch(unreadMessagesStreamProvider.stream),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AdminChatListPage(),
-                          ),
-                        );
-                      },
-                    ),
+                    const BuildingContainer(),
                   ],
                 ),
               ),
-            ),
-
-            // 🏢 Building image pinned to bottom
-            const BuildingContainer(),
-          ],
+            );
+          },
         ),
       ),
     );

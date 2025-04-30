@@ -1,3 +1,4 @@
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -19,16 +20,23 @@ class DocumentRow extends StatelessWidget {
         children: [
           Icon(
             documentUrl != null ? Icons.check_circle : Icons.error,
-            color: documentUrl != null ? Colors.green : Colors.red,
+            color:
+                documentUrl != null ? AppColors.greenBack : AppColors.redBack,
             size: 18,
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(title, style: const TextStyle(color: Colors.white)),
+            child: Text(
+              title,
+              style: const TextStyle(color: AppColors.whiteText),
+            ),
           ),
           if (documentUrl != null)
             IconButton(
-              icon: const Icon(Icons.remove_red_eye, color: Colors.white),
+              icon: const Icon(
+                Icons.remove_red_eye,
+                color: AppColors.whiteText,
+              ),
               onPressed: () async {
                 final uri = Uri.parse(documentUrl!);
 

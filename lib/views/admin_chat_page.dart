@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -97,13 +98,13 @@ class _AdminChatPageState extends ConsumerState<AdminChatPage> {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade400,
+                                  color: AppColors.greyBack,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
                                   _formatDateLabel(timestamp),
                                   style: const TextStyle(
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -128,7 +129,9 @@ class _AdminChatPageState extends ConsumerState<AdminChatPage> {
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color:
-                                  isAdmin ? Colors.blue[200] : Colors.grey[300],
+                                  isAdmin
+                                      ? AppColors.primaryBlueLight
+                                      : AppColors.greyBack,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Column(
@@ -140,7 +143,7 @@ class _AdminChatPageState extends ConsumerState<AdminChatPage> {
                                   _formatTimestamp(timestamp),
                                   style: const TextStyle(
                                     fontSize: 11,
-                                    color: Colors.black54,
+                                    color: AppColors.black,
                                   ),
                                 ),
                               ],

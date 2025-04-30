@@ -1,3 +1,4 @@
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../Main/admin_profile_page.dart';
 import '../Main/settings_page.dart';
@@ -13,17 +14,17 @@ class AdminSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: Container(
-        color: Colors.grey[800],
+        color: AppColors.black,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.black),
+              decoration: BoxDecoration(color: AppColors.black),
               child: Center(
                 child: Text(
                   "Admin Panel",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -36,7 +37,7 @@ class AdminSidebar extends StatelessWidget {
               page: const ActiveUsersPage(),
             ),
             _buildMenuItem(
-              title: "Bookings",
+              title: "Rental History",
               context: context,
               page: const TripHistoryPage(),
             ),
@@ -75,7 +76,7 @@ class AdminSidebar extends StatelessWidget {
     return ListTile(
       title: Text(
         title,
-        style: const TextStyle(color: Colors.white, fontSize: 18),
+        style: const TextStyle(color: AppColors.white, fontSize: 18),
       ),
       onTap: () {
         Navigator.pop(context); // ✅ Closes the sidebar

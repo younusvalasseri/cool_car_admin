@@ -1,3 +1,4 @@
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../Widgets/cool_car_app_bar.dart';
@@ -58,7 +59,7 @@ class VerifyOtpPage extends ConsumerWidget {
                       () => otpNotifier.verifyOtp(context, verificationId),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
-                    backgroundColor: Colors.black,
+                    backgroundColor: AppColors.black,
                   ),
                   child: const Text("Verify"),
                 ),

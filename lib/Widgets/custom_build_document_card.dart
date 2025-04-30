@@ -1,5 +1,6 @@
 // lib\Widgets\custom_build_document_card.dart
 
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,7 +44,7 @@ class CustomBuildDocumentCard extends StatelessWidget {
             bottomRight: Radius.circular(25), // Bottom-right corner rounded
           ),
         ),
-        shadowColor: Colors.black,
+        shadowColor: AppColors.black,
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -55,8 +56,8 @@ class CustomBuildDocumentCard extends StatelessWidget {
                     : Icons.upload_file,
                 color:
                     fileUrl != null || allUploaded == true
-                        ? Colors.green
-                        : Colors.red,
+                        ? AppColors.greenBack
+                        : AppColors.redBack,
                 size: 30,
               ),
               const SizedBox(width: 15),
@@ -68,8 +69,8 @@ class CustomBuildDocumentCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color:
                         fileUrl != null || allUploaded == true
-                            ? Colors.black
-                            : Colors.red,
+                            ? AppColors.black
+                            : AppColors.redBack,
                   ),
                 ),
               ),

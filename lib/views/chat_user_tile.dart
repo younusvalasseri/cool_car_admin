@@ -1,3 +1,4 @@
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class ChatUserTile extends StatelessWidget {
@@ -40,11 +41,9 @@ class ChatUserTile extends StatelessWidget {
             ),
             const SizedBox(width: 12),
 
-            // 🟦 Name + message + timestamp + badge
             Expanded(
               child: Row(
                 children: [
-                  // 🟩 Left Column: Name & message
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,7 +61,7 @@ class ChatUserTile extends StatelessWidget {
                           message,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Colors.black87),
+                          style: const TextStyle(color: AppColors.black),
                         ),
                       ],
                     ),
@@ -76,7 +75,7 @@ class ChatUserTile extends StatelessWidget {
                           TimeOfDay.fromDateTime(timestamp!).format(context),
                           style: const TextStyle(
                             fontSize: 12,
-                            color: Colors.grey,
+                            color: AppColors.greyBack,
                           ),
                         ),
                       Visibility(
@@ -89,13 +88,13 @@ class ChatUserTile extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: const BoxDecoration(
-                            color: Colors.green,
+                            color: AppColors.greenBack,
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
                           child: Text(
                             '$unreadCount',
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                             ),

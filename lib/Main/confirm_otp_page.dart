@@ -15,8 +15,7 @@ class ConfirmOtpPage extends StatelessWidget {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) =>
-              PasswordResetPage(phoneNumber: phoneNumber), // ✅ Pass email
+          builder: (_) => PasswordResetPage(phoneNumber: phoneNumber),
         ),
       );
     }
@@ -29,12 +28,11 @@ class ConfirmOtpPage extends StatelessWidget {
           children: [
             Text('Enter the OTP sent to $phoneNumber'),
             TextField(
-                controller: otpController, keyboardType: TextInputType.number),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: verifyOtp,
-              child: const Text('Verify'),
+              controller: otpController,
+              keyboardType: TextInputType.number,
             ),
+            const SizedBox(height: 20),
+            ElevatedButton(onPressed: verifyOtp, child: const Text('Verify')),
           ],
         ),
       ),

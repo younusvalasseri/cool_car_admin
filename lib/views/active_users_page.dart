@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../Widgets/app_colors.dart';
 import '../Widgets/cool_car_app_bar.dart';
 
 final usersProvider = StreamProvider((ref) {
@@ -53,7 +54,7 @@ class ActiveUsersPage extends ConsumerWidget {
                 margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: ListTile(
                   leading: const CircleAvatar(
-                    backgroundColor: Colors.grey,
+                    backgroundColor: AppColors.greyBack,
                     child: Icon(Icons.person, color: Colors.white),
                   ),
                   title: Text(user['name'] ?? "Unknown"),
@@ -62,7 +63,7 @@ class ActiveUsersPage extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.lock_reset, color: Colors.blue),
+                        icon: Icon(Icons.lock_reset, color: AppColors.blueIcon),
                         onPressed: () {
                           resetPassword(user['email']);
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -73,7 +74,10 @@ class ActiveUsersPage extends ConsumerWidget {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
+                        icon: const Icon(
+                          Icons.delete,
+                          color: AppColors.redIcon,
+                        ),
                         onPressed: () async {
                           final confirm = await showDialog(
                             context: context,
@@ -94,7 +98,9 @@ class ActiveUsersPage extends ConsumerWidget {
                                           () => Navigator.pop(context, true),
                                       child: const Text(
                                         "Delete",
-                                        style: TextStyle(color: Colors.red),
+                                        style: TextStyle(
+                                          color: AppColors.redText,
+                                        ),
                                       ),
                                     ),
                                   ],

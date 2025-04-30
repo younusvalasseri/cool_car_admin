@@ -1,3 +1,4 @@
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../Widgets/cool_car_app_bar.dart';
@@ -35,17 +36,17 @@ class OwnerCarsPage extends ConsumerWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                color: Colors.blue.shade700,
+                color: AppColors.primaryBlue,
                 margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                 child: ListTile(
                   title: Text(
                     car['model'],
-                    style: const TextStyle(color: Colors.white),
+                    style: const TextStyle(color: AppColors.white),
                   ),
 
                   trailing: const Icon(
                     Icons.arrow_forward_ios,
-                    color: Colors.white70,
+                    color: AppColors.white,
                   ),
                   onTap: () {
                     Navigator.push(

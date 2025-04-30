@@ -1,5 +1,6 @@
 import 'package:cool_car_admin/providers/providers.dart';
 
+import '../Widgets/app_colors.dart';
 import '../Widgets/custom_text_field.dart';
 
 import 'package:flutter/material.dart';
@@ -20,7 +21,6 @@ class LoginPage extends ConsumerWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // 🔹 Background Section
           Positioned.fill(
             child: Column(
               children: [
@@ -45,7 +45,7 @@ class LoginPage extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: AppColors.textDark,
                               ),
                             ),
                             SizedBox(height: 8),
@@ -53,7 +53,7 @@ class LoginPage extends ConsumerWidget {
                               "Welcome to Cool Management",
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: AppColors.textDark,
                               ),
                             ),
                           ],
@@ -75,14 +75,7 @@ class LoginPage extends ConsumerWidget {
             child: Container(
               height: MediaQuery.of(context).size.height * 0.625,
               decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color.fromARGB(255, 116, 190, 237),
-                    Color.fromARGB(191, 116, 190, 237),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: AppColors.loginBackgroundGradient,
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -139,8 +132,8 @@ class LoginPage extends ConsumerWidget {
                                 context,
                               ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.black,
+                        foregroundColor: AppColors.whiteText,
                         minimumSize: const Size(double.infinity, 50),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50),
@@ -165,7 +158,7 @@ class LoginPage extends ConsumerWidget {
                     // 🔹 Social Media Login
                     const Text(
                       "Login with social media",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppColors.whiteText),
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -196,7 +189,10 @@ class LoginPage extends ConsumerWidget {
                           ),
                       child: const Text(
                         "Don't have an account? Sign up",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(
+                          color: AppColors.whiteText,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ],
@@ -213,7 +209,7 @@ class LoginPage extends ConsumerWidget {
     return GestureDetector(
       onTap: onTap,
       child: CircleAvatar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         radius: 30,
         child: Image.asset(asset, height: 28),
       ),

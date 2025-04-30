@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -177,8 +178,8 @@ class AnnouncementsPage extends ConsumerWidget {
                 icon: const Icon(Icons.send),
                 label: const Text("Submit Announcement"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.primaryBlue,
+                  foregroundColor: AppColors.white,
                 ),
               ),
 
@@ -234,7 +235,7 @@ class AnnouncementsPage extends ConsumerWidget {
                               IconButton(
                                 icon: const Icon(
                                   Icons.edit,
-                                  color: Colors.blue,
+                                  color: AppColors.primaryBlue,
                                 ),
                                 onPressed: () {
                                   headingController.text = data['title'];
@@ -247,7 +248,7 @@ class AnnouncementsPage extends ConsumerWidget {
                               IconButton(
                                 icon: const Icon(
                                   Icons.delete,
-                                  color: Colors.red,
+                                  color: AppColors.redIcon,
                                 ),
                                 onPressed:
                                     () => _deleteAnnouncement(context, doc),

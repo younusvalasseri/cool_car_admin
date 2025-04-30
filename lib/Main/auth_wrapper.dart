@@ -12,11 +12,9 @@ class AuthWrapper extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // If the snapshot has data (i.e. user is signed in), show HomePage.
         if (snapshot.hasData) {
           return const AdminHomePage();
         }
-        // Otherwise, show the LoginPage.
         return const LoginPage();
       },
     );

@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../Widgets/app_colors.dart';
 import '../Widgets/cool_car_app_bar.dart';
 
 class CoolCarRevenuePage extends ConsumerWidget {
@@ -33,7 +34,7 @@ class CoolCarRevenuePage extends ConsumerWidget {
                   barRods: [
                     BarChartRodData(
                       toY: entry.value,
-                      color: Colors.blue,
+                      color: AppColors.barChartColor,
                       width: 60,
                       borderRadius: BorderRadius.circular(5),
                     ),
@@ -53,7 +54,7 @@ class CoolCarRevenuePage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
                 SizedBox(
-                  height: 350, // ✅ Increased height for better view
+                  height: 350,
                   child: BarChart(
                     BarChartData(
                       barGroups: barGroups,
@@ -67,7 +68,7 @@ class CoolCarRevenuePage extends ConsumerWidget {
                                 child: Text(
                                   "₹${data.values.elementAt(value.toInt()).toStringAsFixed(0)}",
                                   style: const TextStyle(
-                                    color: Colors.black,
+                                    color: AppColors.blackText,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -105,7 +106,7 @@ class CoolCarRevenuePage extends ConsumerWidget {
                           getTooltipItem: (group, groupIndex, rod, rodIndex) {
                             return BarTooltipItem(
                               "₹${rod.toY.toStringAsFixed(2)}",
-                              const TextStyle(color: Colors.white),
+                              const TextStyle(color: AppColors.whiteText),
                             );
                           },
                         ),

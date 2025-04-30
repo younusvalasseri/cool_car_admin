@@ -1,3 +1,4 @@
+import 'package:cool_car_admin/Widgets/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../Widgets/cool_car_app_bar.dart';
@@ -40,12 +41,12 @@ class UserDocumentsPage extends ConsumerWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        color: Colors.blue.shade700,
+                        color: AppColors.primaryBlue,
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         child: ListTile(
                           title: Text(
                             userName,
-                            style: const TextStyle(color: Colors.white),
+                            style: const TextStyle(color: AppColors.white),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,7 +76,7 @@ class UserDocumentsPage extends ConsumerWidget {
                   error:
                       (error, _) => Text(
                         "Error: $error",
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(color: AppColors.white),
                       ),
                 );
               },
