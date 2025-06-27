@@ -32,7 +32,6 @@ CoolCar was born to digitize and streamline the operations of a private car rent
 | Language      | Dart                      |
 | Framework     | Flutter                   |
 | Backend       | Firebase Firestore        |
-| Local Storage | Hive                      |
 | Payments      | Razorpay                  |
 | Messaging     | WhatsApp API              |
 | State Mgmt    | Riverpod                  |
@@ -89,11 +88,12 @@ Ensure `google-services.json` (Android) and/or `GoogleService-Info.plist` (iOS) 
 
 ```bash
 lib/
-├── screens/             # All screens (Dashboard, RideApproval, etc.)
-├── widgets/             # Reusable UI widgets
-├── providers.dart       # Firebase & state logic (using Riverpod)
-├── models/              # Data models (User, Vehicle, Ride, etc.)
-├── main.dart            # Entry point
+├── Main/           # Registration and verification pages
+├── widgets/        # Reusable UI widgets
+├── documents       # Car documents and Owner documents.
+├── providers/      # Aut helper and Riverpod class
+├── views/          # All screens (Dashboard, RideApproval, etc.)
+├── main.dart       # Entry point
 ```
 
 ---
@@ -102,7 +102,6 @@ lib/
 
 * 🔗 [Razorpay Payment Link (Demo)](https://razorpay.me/@coolcar)
 * 📄 [Firestore Setup Guide](https://firebase.google.com/docs/firestore)
-* 📦 [Hive Flutter Documentation](https://docs.hivedb.dev/)
 * 🔧 [Riverpod for State Management](https://riverpod.dev/)
 
 ---
@@ -123,15 +122,3 @@ Special thanks to:
 Director, Institute of Automobile Technology (IAT)
 [GitHub Profile](https://github.com/younusvalasseri)
 
----
-
-## 📜 License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-```
-
----
-
-Would you like me to automatically create a `README.md` file and open a pull request in your repo via a GitHub token? Or would you like to copy-paste this manually?
-```
