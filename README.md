@@ -32,7 +32,7 @@ CoolCar was born to digitize and streamline the operations of a private car rent
 | Framework     | Flutter                   |
 | Backend       | Firebase Firestore        |
 | Payments      | Razorpay                  |
-| Messaging     | WhatsApp API              |
+| Messaging     |Firebase Cloud Messaging   |
 | State Mgmt    | Riverpod                  |
 | Notifications | Firebase Cloud Messaging  |
 | Media Upload  | Firebase Storage          |
