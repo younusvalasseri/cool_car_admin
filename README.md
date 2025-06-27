@@ -6,7 +6,7 @@ Cool Car Admin is the backend admin panel of the CoolCar project — a private t
 
 ## 📖 Story Behind CoolCar
 
-CoolCar was born to digitize and streamline the operations of a private car rental and taxi business. The system empowers a rental agency to coordinate between private car owners (CoolTaxi partners), in-house drivers, and customers, all under a unified platform with real-time notifications, GPS tracking, and remote control capabilities.
+CoolCar was born to digitize and streamline the operations of a private car rental and taxi business. The system empowers a rental agency to coordinate between private car owners (CoolTaxi partners), in-house drivers, and customers, all under a unified platform with real-time notifications, and remote control capabilities.
 
 ---
 
@@ -17,7 +17,6 @@ CoolCar was born to digitize and streamline the operations of a private car rent
 - 📦 Manage incoming ride requests
 - 🚘 Approve or reject vehicle/driver participation
 - 💳 View payment status and activate "Complete Ride" only after Razorpay success
-- 📍 Monitor real-time GPS locations of vehicles
 - 📩 Push notifications to drivers and customers
 - 📄 View and manage ride history, completed bookings, and pending actions
 - 📊 Dashboard summary for quick analytics
